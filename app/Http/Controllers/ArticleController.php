@@ -110,24 +110,37 @@ class ArticleController extends Controller
             return response()->json("Selection impossible {$e->getMessage()}");
         }
     }
-    /*public function paginationPaginate()
+  /**
+ * Get articles with full category hierarchy
+ */
+public function articlesWithCategories()
 {
-$perPage = request()->input('pageSize', 2); // Récupère la valeur dynamique pourla pagination
-// Récupère le filtre par désignation depuis la requête
-$filterDesignation = request()->input('filtre');
-// Construction de la requête
-$query = Article::with('scategories');
-// Applique le filtre sur la désignation s'il est fourni
-if ($filterDesignation) {
-$query->where('designation', 'like', '%' . $filterDesignation . '%');
+    try {
+        $articles = Article::with(['scategorie.categorie'])->get();
+        
+        $result = $articles->map(function ($article) {
+            return [
+                'id' => $article->id,
+                'designation' => $article->designation,
+                'subcategory_id' => $article->scategorieID,
+                'subcategory_name' => $article->scategorie->nomscategorie ?? null,
+                'category_id' => $article->scategorie->categorieID ?? null,
+                'category_name' => $article->scategorie->categorie->nomcategorie ?? null
+            ];
+        });
+        
+        return response()->json($result, 200);
+    } catch (\Exception $e) {
+        return response()->json("Error retrieving articles with categories: {$e->getMessage()}", 500);
+    }
 }
-// Paginer les résultats après avoir appliqué le filtre
-$articles = $query->paginate($perPage);
-// Retourne le résultat en format JSON API
-return response()->json([
-'products' => $articles->items(), // Les articles paginés
-'totalPages' => $articles->lastPage(), // Le nombre de pages
-]);
-
-}*/
+public function articleCountsByCategory()
+{
+    $counts = Article::with('scategorie.categorie')
+        ->get()
+        ->groupBy('scategorie.categorie.nomcategorie')
+        ->map->count();
+    
+    return response()->json($counts);
+}
 }
