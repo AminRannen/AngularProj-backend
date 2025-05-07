@@ -86,4 +86,17 @@ class ScategorieController extends Controller
             return response()->json("Selection impossible {$e->getMessage()}");
         }
     }
+    public function getCategorieByScategorieID($idscat)
+{
+    try {
+        $scategorie = Scategorie::with('categorie')->where('id', $idscat)->first();
+        if (!$scategorie) {
+            return response()->json(['error' => 'Subcategory not found'], 404);
+        }
+        return response()->json($scategorie->categorie);
+    } catch (\Exception $e) {
+        return response()->json(['error' => "Selection impossible {$e->getMessage()}"], 500);
+    }
+}
+
 }

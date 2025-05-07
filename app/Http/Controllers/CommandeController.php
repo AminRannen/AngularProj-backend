@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Commande;
 use App\Models\User;
-
+use App\Models\Article;
 class CommandeController extends Controller
 {
     // Get all commandes with related data
@@ -132,4 +132,6 @@ class CommandeController extends Controller
 
         return response()->json($commande->ligneCommandes);
     }
+   
+
 }

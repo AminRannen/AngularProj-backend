@@ -56,17 +56,26 @@ class CategorieController extends Controller
 
     /**
      * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
-    {
-        try {
-            $categorie = Categorie::findOrFail($id);
-            $categorie->update($request->all());
-        } catch (\Exception $e) {
-            return response()->json("probleme de modification{$e->getMessage()},{$e->getCode()}");
-        }
+     */public function update(Request $request, $id)
+{
+    try {
+        $categorie = Categorie::findOrFail($id);
+        $updated = $categorie->update($request->all());
+        
+        return response()->json([
+            'success' => $updated,
+            'data' => $categorie,
+            'message' => $updated ? 'Category updated successfully' : 'Failed to update category'
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error updating category',
+            'error' => $e->getMessage()
+        ], 500);
     }
-
+}
     /**
      * Remove the specified resource from storage.
      */
@@ -74,10 +83,29 @@ class CategorieController extends Controller
     {
         try {
             $categorie = Categorie::findOrFail($id);
+            
+            // Check if category has subcategories
+            if ($categorie->scategories()->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot delete category with existing subcategories'
+                ], 422);
+            }
+            
             $categorie->delete();
-            return response()->json('Catégorie supprimée!');
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Category deleted successfully'
+            ]);
+            
         } catch (\Exception $e) {
-            return response()->json(["message" => "problème de delete"]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete category',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
+    
 }

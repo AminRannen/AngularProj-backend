@@ -27,12 +27,14 @@ Route::put('/users/{id}', [UserController::class, 'update']);   // Update user
 Route::delete('/users/{id}', [UserController::class, 'destroy']); // Delete user
 Route::get('/users/{id}', [UserController::class, 'getUserById']);
 
-
-
+Route::get('/get-categorie/{idscat}', [ScategorieController::class, 'getCategorieByScategorieID']);
 
 Route::middleware('api')->group(function () {
-    Route::resource('categories', CategorieController::class);
+    Route::resource('categories', CategorieController::class)->except(['destroy']);
+    Route::delete('/categories/{id}', [CategorieController::class, 'destroy']);
 });
+
+
 /*Route::get("/scategories",[ScategorieController::class,'index']);*/
 Route::middleware('api')->group(function () {
     Route::resource('scategories', ScategorieController::class);
@@ -48,6 +50,7 @@ Route::get('/article-counts-by-category', [ArticleController::class, 'articleCou
 // Routes for commandes
 Route::apiResource('commandes', CommandeController::class);
 Route::patch('commandes/{id}/status', [CommandeController::class, 'updateStatus']);
+Route::put('/articles/{id}/update-stock', [ArticleController::class, 'updateArticleStock']);
 
 // Routes for ligneCommandes
 Route::apiResource('ligne-commandes', LigneCommandeController::class);

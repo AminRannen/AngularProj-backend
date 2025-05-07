@@ -143,4 +143,23 @@ public function articleCountsByCategory()
     
     return response()->json($counts);
 }
+public function updateArticleStock(Request $request, $id)
+{
+    try {
+        $article = Article::findOrFail($id);
+        $quantity = $request->input('quantity');
+
+        // Ensure valid quantity before updating stock
+        if ($quantity > 0 && $article->qtestock >= $quantity) {
+            $article->qtestock -= $quantity;
+            $article->save();
+            return response()->json(['message' => 'Stock updated successfully', 'qtestock' => $article->qtestock]);
+        } else {
+            return response()->json(['error' => 'Invalid stock update'], 400);
+        }
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Server error: ' . $e->getMessage()], 500);
+    }
+}
+
 }
